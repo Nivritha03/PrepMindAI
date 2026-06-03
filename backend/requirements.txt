@@ -6,8 +6,8 @@ langchain-community
 langgraph
 chromadb
 sentence-transformers
-sqlalchemy
-psycopg2-binary
+motor
+beanie
 pydantic
 python-jose[cryptography]
 passlib[bcrypt]

@@ -85,7 +85,7 @@ A background scheduler (powered by APScheduler) runs alongside the server and:
 | **Backend** | FastAPI, Python 3.11, Uvicorn |
 | **AI Agents** | LangGraph, LangChain, Google Gemini / OpenAI |
 | **Vector Memory** | ChromaDB (semantic search & long-term context) |
-| **Relational DB** | PostgreSQL (via SQLAlchemy ORM) |
+| **Database** | MongoDB Atlas (via Beanie/Motor ODM) |
 | **Background Jobs** | APScheduler |
 | **Containerization** | Docker, Docker Compose |
 
@@ -107,7 +107,7 @@ User → React Frontend
     ├── Coding Agent       → Creates coding challenges
     └── Feedback Agent     → Scores & critiques answers
          ↓              ↓
-     PostgreSQL       ChromaDB
+   MongoDB Atlas      ChromaDB
     (User data)    (Vector memory)
 ```
 
@@ -136,7 +136,7 @@ PrepMindAI/
 │       ├── api/
 │       │   └── routes.py       # FastAPI route handlers
 │       ├── db/
-│       │   └── database.py     # SQLAlchemy engine & session
+│       │   └── database.py     # MongoDB Motor client & Beanie init
 │       ├── models/
 │       │   └── models.py       # User, Interview, Roadmap models
 │       ├── memory/
@@ -147,8 +147,7 @@ PrepMindAI/
 │       │   └── linkedin_analyzer.py # LinkedIn ATS hint parser
 │       └── main.py             # FastAPI app + APScheduler startup
 │
-├── docker-compose.yml          # PostgreSQL database container
-├── backend/Dockerfile          # Backend container definition
+├── backend/                    # Python Backend
 └── README.md
 ```
 
@@ -159,16 +158,16 @@ PrepMindAI/
 ### Prerequisites
 - Node.js v18+
 - Python 3.11+
-- Docker Desktop (for the database)
 - An API key from [Google AI Studio](https://aistudio.google.com) (Gemini) or OpenAI
+- MongoDB Atlas cluster and connection URI
 
 ---
 
-### Step 1 — Start the Database
-```bash
-docker-compose up -d
+### Step 1 — Config Database
+Create a `.env` file in the `backend/` directory with your MongoDB Atlas URI:
+```env
+DATABASE_URL=mongodb+srv://<user>:<password>@cluster0...
 ```
-This starts a PostgreSQL 15 container on port `5432`.
 
 ---
 

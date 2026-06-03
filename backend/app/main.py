@@ -5,6 +5,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from contextlib import asynccontextmanager
 
 from .api.routes import router as api_router
+from .db.database import init_db
 
 logger = logging.getLogger("prepmind")
 
@@ -12,11 +13,15 @@ logger = logging.getLogger("prepmind")
 def check_reminders_and_notify():
     # Example autonomous task logic
     # Here you would query the DB for tasks with status PENDING and deadlines < 24 hrs
-    logger.info("Autonomous Agent: Scanning SQL ROADMAPS for upcoming deadlines...")
+    logger.info("Autonomous Agent: Scanning MongoDB ROADMAPS for upcoming deadlines...")
     # send_email(...)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    # Startup MongoDB connection
+    await init_db()
+    logger.info("MongoDB initialized with Beanie.")
+    
     # Startup APScheduler
     scheduler = BackgroundScheduler()
     # Runs the check every 60 seconds for demonstration (normally set to hours/days)

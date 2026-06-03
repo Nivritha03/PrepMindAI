@@ -1,48 +1,50 @@
-from sqlalchemy import Column, Integer, String, Enum, DateTime
-from sqlalchemy.sql import func
-import enum
-from ..db.database import Base
+from datetime import datetime
+from enum import Enum
+from typing import Optional
 
-class InterviewType(str, enum.Enum):
+from beanie import Document, PydanticObjectId
+from pydantic import Field
+
+class InterviewType(str, Enum):
     TECHNICAL = "TECHNICAL"
     HR = "HR"
     BEHAVIORAL = "BEHAVIORAL"
 
-class User(Base):
-    __tablename__ = "users"
+class User(Document):
+    name: str = Field(index=True)
+    email: str = Field(unique=True, index=True)
+    password: str
+    target_company: Optional[str] = None
+    target_role: Optional[str] = None
+    experience_level: Optional[str] = None
+    created_at: datetime = Field(default_factory=datetime.utcnow)
 
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, index=True)
-    email = Column(String, unique=True, index=True)
-    password = Column(String)  # Hashed password
-    target_company = Column(String, nullable=True)
-    target_role = Column(String, nullable=True)
-    experience_level = Column(String, nullable=True)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    class Settings:
+        name = "users"
 
-class Interview(Base):
-    __tablename__ = "interviews"
+class Interview(Document):
+    user_id: PydanticObjectId = Field(index=True)
+    interview_type: InterviewType
+    score: Optional[int] = None
+    feedback: Optional[str] = None
+    created_at: datetime = Field(default_factory=datetime.utcnow)
 
-    id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, index=True)
-    interview_type = Column(Enum(InterviewType))
-    score = Column(Integer, nullable=True)
-    feedback = Column(String, nullable=True)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    class Settings:
+        name = "interviews"
 
-class Skill(Base):
-    __tablename__ = "skills"
+class Skill(Document):
+    user_id: PydanticObjectId = Field(index=True)
+    skill_name: str = Field(index=True)
+    strength_level: int
 
-    id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, index=True)
-    skill_name = Column(String, index=True)
-    strength_level = Column(Integer)  # e.g. 1 to 5
+    class Settings:
+        name = "skills"
 
-class Roadmap(Base):
-    __tablename__ = "roadmaps"
+class Roadmap(Document):
+    user_id: PydanticObjectId = Field(index=True)
+    task: str
+    status: str
+    deadline: Optional[datetime] = None
 
-    id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, index=True)
-    task = Column(String)
-    status = Column(String)  # e.g., PENDING, IN_PROGRESS, COMPLETED
-    deadline = Column(DateTime(timezone=True), nullable=True)
+    class Settings:
+        name = "roadmaps"

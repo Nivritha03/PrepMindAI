@@ -1,15 +1,13 @@
-from fastapi import APIRouter, UploadFile, File, Depends, HTTPException
-from sqlalchemy.orm import Session
 from typing import Dict, Any
+from fastapi import APIRouter, UploadFile, File, HTTPException
 
-from ..db.database import get_db
 from ..services.pdf_parser import extract_text_from_pdf
 from ..agents.graph import onboarding_graph, interview_graph
 
 router = APIRouter()
 
 @router.get("/dashboard")
-async def get_dashboard(db: Session = Depends(get_db)):
+async def get_dashboard():
     """
     Returns analytics and metrics for the user dashboard.
     """
@@ -24,7 +22,7 @@ async def get_dashboard(db: Session = Depends(get_db)):
     }
 
 @router.post("/upload-resume")
-async def upload_resume(file: UploadFile = File(...), db: Session = Depends(get_db)):
+async def upload_resume(file: UploadFile = File(...)):
     """
     Parses a PDF resume and runs the onboarding LangGraph workflow.
     """

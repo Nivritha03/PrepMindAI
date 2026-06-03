@@ -9,10 +9,12 @@ import Dashboard from './pages/Dashboard';
 import ResumeUpload from './pages/ResumeUpload';
 import Roadmap from './pages/Roadmap';
 import InterviewRoom from './pages/InterviewRoom';
+import CustomCursor from './components/ui/CustomCursor';
 
 function App() {
   return (
     <AuthProvider>
+      <CustomCursor />
       <BrowserRouter>
         <Routes>
           {/* Public routes */}
