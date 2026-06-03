@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
-const API_BASE = 'http://localhost:8000/api/auth';
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/auth';
 
 interface User {
   id: string;
