@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/auth';
+const BACKEND_URL = (import.meta.env.VITE_API_URL || 'http://localhost:8000').replace(/\/$/, '');
+const API_BASE = `${BACKEND_URL}/api/auth`;
 
 interface User {
   id: string;
