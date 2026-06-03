@@ -5,6 +5,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from contextlib import asynccontextmanager
 
 from .api.routes import router as api_router
+from .api.auth import router as auth_router
 from .db.database import init_db
 
 logger = logging.getLogger("prepmind")
@@ -50,6 +51,7 @@ app.add_middleware(
 )
 
 app.include_router(api_router, prefix="/api")
+app.include_router(auth_router, prefix="/api/auth")
 
 @app.get("/")
 async def root():

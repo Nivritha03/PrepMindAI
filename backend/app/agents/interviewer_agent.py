@@ -1,9 +1,13 @@
 from ..agents.state import AgentState
 from langchain_core.messages import SystemMessage, HumanMessage
 
+class MockResponse:
+    def __init__(self, content: str):
+        self.content = content
+
 class MockLLM:
-    def invoke(self, messages):
-        return type('obj', (object,), {'content': 'Can you explain the difference between a process and a thread?'})
+    def invoke(self, messages) -> MockResponse:
+        return MockResponse(content='Can you explain the difference between a process and a thread?')
 
 llm = MockLLM()
 

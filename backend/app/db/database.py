@@ -15,7 +15,7 @@ DATABASE_NAME = os.getenv("DATABASE_NAME", "prepmind_db")
 async def init_db():
     client = AsyncIOMotorClient(DATABASE_URL)
     await init_beanie(
-        database=client[DATABASE_NAME], 
+        database=client[DATABASE_NAME], # type: ignore 
         document_models=[
             User, 
             Interview, 

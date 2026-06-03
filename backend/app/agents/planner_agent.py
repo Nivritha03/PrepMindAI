@@ -2,9 +2,13 @@ from ..agents.state import AgentState
 from langchain_core.messages import SystemMessage
 import json
 
+class MockResponse:
+    def __init__(self, content: str):
+        self.content = content
+
 class MockLLM:
-    def invoke(self, messages):
-        return type('obj', (object,), {'content': '{"roadmap": [{"task": "Review System Design Concepts", "deadline": "2 Days"}]}'})
+    def invoke(self, messages) -> MockResponse:
+        return MockResponse(content='{"roadmap": [{"task": "Review System Design Concepts", "deadline": "2 Days"}]}')
 
 llm = MockLLM()
 

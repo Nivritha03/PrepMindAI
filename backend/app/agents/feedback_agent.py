@@ -2,9 +2,13 @@ from ..agents.state import AgentState
 from langchain_core.messages import SystemMessage
 import json
 
+class MockResponse:
+    def __init__(self, content: str):
+        self.content = content
+
 class MockLLM:
-    def invoke(self, messages):
-        return type('obj', (object,), {'content': '{"feedback": "Good understanding, but missed mentioning memory isolation.", "score": 7}'})
+    def invoke(self, messages) -> MockResponse:
+        return MockResponse(content='{"feedback": "Good understanding, but missed mentioning memory isolation.", "score": 7}')
 
 llm = MockLLM()
 

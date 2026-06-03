@@ -6,11 +6,15 @@ import json
 # from langchain_google_genai import ChatGoogleGenerativeAI
 # llm = ChatGoogleGenerativeAI(model="gemini-1.5-flash")
 
+class MockResponse:
+    def __init__(self, content: str):
+        self.content = content
+
 class MockLLM:
     """Mock LLM to represent output until API keys are configured."""
-    def invoke(self, messages):
+    def invoke(self, messages) -> MockResponse:
         # Extremely basic mock for parsing
-        return type('obj', (object,), {'content': '{"skills": ["Python", "React", "FastAPI"], "weaknesses": ["System Design"]}'})
+        return MockResponse(content='{"skills": ["Python", "React", "FastAPI"], "weaknesses": ["System Design"]}')
 
 llm = MockLLM()
 

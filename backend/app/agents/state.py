@@ -3,7 +3,7 @@ from langgraph.graph.message import add_messages
 from langchain_core.messages import BaseMessage
 
 
-class AgentState(TypedDict):
+class AgentState(TypedDict, total=False):
     """
     State object for the Multi-Agent Interview Prep Workflow.
     """

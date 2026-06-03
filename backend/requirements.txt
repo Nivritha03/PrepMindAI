@@ -6,7 +6,7 @@ langchain-community
 langgraph
 chromadb
 sentence-transformers
-motor
+motor<3.6
 beanie
 pydantic
 python-jose[cryptography]

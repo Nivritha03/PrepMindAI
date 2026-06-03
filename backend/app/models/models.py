@@ -2,7 +2,7 @@ from datetime import datetime
 from enum import Enum
 from typing import Optional
 
-from beanie import Document, PydanticObjectId
+from beanie import Document, Indexed, PydanticObjectId
 from pydantic import Field
 
 class InterviewType(str, Enum):
@@ -11,8 +11,8 @@ class InterviewType(str, Enum):
     BEHAVIORAL = "BEHAVIORAL"
 
 class User(Document):
-    name: str = Field(index=True)
-    email: str = Field(unique=True, index=True)
+    name: Indexed(str) # type: ignore
+    email: Indexed(str, unique=True) # type: ignore
     password: str
     target_company: Optional[str] = None
     target_role: Optional[str] = None
@@ -23,7 +23,7 @@ class User(Document):
         name = "users"
 
 class Interview(Document):
-    user_id: PydanticObjectId = Field(index=True)
+    user_id: Indexed(PydanticObjectId) # type: ignore
     interview_type: InterviewType
     score: Optional[int] = None
     feedback: Optional[str] = None
@@ -33,15 +33,15 @@ class Interview(Document):
         name = "interviews"
 
 class Skill(Document):
-    user_id: PydanticObjectId = Field(index=True)
-    skill_name: str = Field(index=True)
+    user_id: Indexed(PydanticObjectId) # type: ignore
+    skill_name: Indexed(str) # type: ignore
     strength_level: int
 
     class Settings:
         name = "skills"
 
 class Roadmap(Document):
-    user_id: PydanticObjectId = Field(index=True)
+    user_id: Indexed(PydanticObjectId) # type: ignore
     task: str
     status: str
     deadline: Optional[datetime] = None

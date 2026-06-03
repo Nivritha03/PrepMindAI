@@ -26,7 +26,7 @@ async def upload_resume(file: UploadFile = File(...)):
     """
     Parses a PDF resume and runs the onboarding LangGraph workflow.
     """
-    if not file.filename.endswith(".pdf"):
+    if not file.filename or not file.filename.endswith(".pdf"):
         raise HTTPException(status_code=400, detail="Only PDF files are supported.")
         
     pdf_bytes = await file.read()
@@ -40,7 +40,7 @@ async def upload_resume(file: UploadFile = File(...)):
     }
     
     # Run the onboarding Master agent graph
-    result = onboarding_graph.invoke(initial_state)
+    result = onboarding_graph.invoke(initial_state) # type: ignore
     
     return {
         "status": "success",
@@ -63,7 +63,7 @@ async def start_interview(payload: Dict[str, Any]):
     }
     
     # Trigger graph up to the interviewer node
-    result = interview_graph.invoke(initial_state)
+    result = interview_graph.invoke(initial_state) # type: ignore
     
     return {
         "question": result.get("current_question", "Give me an overview of your experience.")
@@ -84,7 +84,7 @@ async def submit_answer(payload: Dict[str, Any]):
     }
     
     # Run the feedback eval graph
-    result = interview_graph.invoke(current_state)
+    result = interview_graph.invoke(current_state) # type: ignore
     
     return {
         "feedback": result.get("feedback", ""),

@@ -29,7 +29,7 @@ def store_resume_chunks(user_id: int, text_chunks: list[str]):
     # unless sentence-transformers is strictly specified to run manually.
     collection.add(
         documents=text_chunks,
-        metadatas=metadatas,
+        metadatas=metadatas, # type: ignore
         ids=ids
     )
 
