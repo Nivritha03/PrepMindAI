@@ -1,17 +1,20 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
+const API_BASE = 'http://localhost:8000/api/auth';
+
 interface User {
   id: string;
   name: string;
   email: string;
-  role: string; // target role e.g. "Software Engineer"
-  experience: string; // "Fresher" | "Junior" | "Mid" | "Senior"
+  role: string;
+  experience: string;
   resumeUploaded: boolean;
   avatarInitials: string;
 }
 
 interface AuthContextType {
   user: User | null;
+  token: string | null;
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<boolean>;
   signup: (name: string, email: string, password: string, role: string, experience: string) => Promise<boolean>;
@@ -23,48 +26,84 @@ const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [token, setToken] = useState<string | null>(null);
 
   useEffect(() => {
-    const stored = localStorage.getItem('prepmind_user');
-    if (stored) setUser(JSON.parse(stored));
+    const storedUser = localStorage.getItem('prepmind_user');
+    const storedToken = localStorage.getItem('prepmind_token');
+    if (storedUser && storedToken) {
+      setUser(JSON.parse(storedUser));
+      setToken(storedToken);
+    }
   }, []);
 
-  const login = async (email: string, _password: string): Promise<boolean> => {
-    const stored = localStorage.getItem('prepmind_users');
-    if (!stored) return false;
-    const users: User[] = JSON.parse(stored);
-    const found = users.find(u => u.email === email);
-    if (!found) return false;
-    setUser(found);
-    localStorage.setItem('prepmind_user', JSON.stringify(found));
-    return true;
+  const login = async (email: string, password: string): Promise<boolean> => {
+    try {
+      const res = await fetch(`${API_BASE}/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+      if (!res.ok) return false;
+      const data = await res.json();
+      const mappedUser: User = {
+        id: data.user.id,
+        name: data.user.name,
+        email: data.user.email,
+        role: data.user.target_role ?? '',
+        experience: data.user.experience_level ?? '',
+        resumeUploaded: data.user.resumeUploaded ?? false,
+        avatarInitials: data.user.avatarInitials ?? '',
+      };
+      setUser(mappedUser);
+      setToken(data.token);
+      localStorage.setItem('prepmind_user', JSON.stringify(mappedUser));
+      localStorage.setItem('prepmind_token', data.token);
+      return true;
+    } catch {
+      return false;
+    }
   };
 
-  const signup = async (name: string, email: string, _password: string, role: string, experience: string): Promise<boolean> => {
-    const stored = localStorage.getItem('prepmind_users');
-    const users: User[] = stored ? JSON.parse(stored) : [];
-    if (users.find(u => u.email === email)) return false; // already exists
-    
-    const newUser: User = {
-      id: Date.now().toString(),
-      name,
-      email,
-      role,
-      experience,
-      resumeUploaded: false,
-      avatarInitials: name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2),
-    };
-    
-    users.push(newUser);
-    localStorage.setItem('prepmind_users', JSON.stringify(users));
-    setUser(newUser);
-    localStorage.setItem('prepmind_user', JSON.stringify(newUser));
-    return true;
+  const signup = async (
+    name: string,
+    email: string,
+    password: string,
+    role: string,
+    experience: string
+  ): Promise<boolean> => {
+    try {
+      const res = await fetch(`${API_BASE}/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password, target_role: role, experience_level: experience }),
+      });
+      if (!res.ok) return false;
+      const data = await res.json();
+      const mappedUser: User = {
+        id: data.user.id,
+        name: data.user.name,
+        email: data.user.email,
+        role: data.user.target_role ?? role,
+        experience: data.user.experience_level ?? experience,
+        resumeUploaded: data.user.resumeUploaded ?? false,
+        avatarInitials: data.user.avatarInitials ?? name.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2),
+      };
+      setUser(mappedUser);
+      setToken(data.token);
+      localStorage.setItem('prepmind_user', JSON.stringify(mappedUser));
+      localStorage.setItem('prepmind_token', data.token);
+      return true;
+    } catch {
+      return false;
+    }
   };
 
   const logout = () => {
     setUser(null);
+    setToken(null);
     localStorage.removeItem('prepmind_user');
+    localStorage.removeItem('prepmind_token');
   };
 
   const updateUser = (updates: Partial<User>) => {
@@ -72,20 +111,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const updated = { ...user, ...updates };
     setUser(updated);
     localStorage.setItem('prepmind_user', JSON.stringify(updated));
-    // also update in users list
-    const stored = localStorage.getItem('prepmind_users');
-    if (stored) {
-      const users: User[] = JSON.parse(stored);
-      const idx = users.findIndex(u => u.id === user.id);
-      if (idx !== -1) {
-        users[idx] = updated;
-        localStorage.setItem('prepmind_users', JSON.stringify(users));
-      }
-    }
   };
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated: !!user, login, signup, logout, updateUser }}>
+    <AuthContext.Provider value={{ user, token, isAuthenticated: !!user, login, signup, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   );
